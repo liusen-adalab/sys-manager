@@ -4,7 +4,7 @@ use anyhow::{bail, Result};
 use rexpect::{reader::Regex, ReadUntil};
 use tempfile::NamedTempFile;
 use tokio::{io::AsyncReadExt, process::Command};
-use tracing::{debug, warn};
+use tracing::{debug, info, warn};
 
 pub struct Node {
     ip: IpAddr,
@@ -34,7 +34,10 @@ impl Node {
     }
 
     pub async fn uninstall(&self) -> Result<()> {
-        todo!()
+        let url = "http://10.0.10.59:8089/cmd/uninstall";
+        let res = get!(url, ret: text);
+        info!(res, "uninstalled");
+        Ok(())
     }
 
     pub async fn restart(&self) -> Result<()> {
@@ -54,7 +57,7 @@ impl Node {
     }
 }
 
-use crate::log_err_ctx;
+use crate::{get, log_err_ctx, post};
 
 async fn ssh_copy_id(host: &IpAddr, user: &str, password: &str) -> Result<()> {
     let remote = format!("{}@{}", user, host);

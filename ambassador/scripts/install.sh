@@ -6,7 +6,9 @@ pack_path=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 mkdir -p /etc/${bin_name}/
 /usr/bin/cp ${pack_path}/config.toml /etc/${bin_name}/
+/usr/bin/cp ${pack_path}/uninstall.sh /etc/${bin_name}/
 
 /usr/bin/cp ${pack_path}/${bin_name}.service /etc/systemd/system/
 systemctl enable ${bin_name} --now
 
+systemctl daemon-reload
