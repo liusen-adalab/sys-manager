@@ -1,16 +1,5 @@
-pub mod hardware;
-pub mod manager;
-pub mod software;
-
-#[macro_export]
-macro_rules! log_if_err {
-    ($run:expr) => {
-        crate::log_if_err!($run, stringify!($run))
-    };
-
-    ($run:expr, $msg:expr $(,)?) => {
-        if let Err(err) = $run {
-            ::tracing::error!(?err, concat!("FAILED: ", $msg))
-        }
-    };
-}
+pub mod application;
+pub mod controller;
+pub mod domain;
+mod infrastructure;
+pub mod macros;

@@ -6,8 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+actix-web.workspace = true
 anyhow.workspace = true
 futures.workspace = true
 protocol = { version = "0.1.0", path = "../protocol" }
 tokio.workspace = true
 tokio-util.workspace = true
+
+[dev-dependencies]
+tracing-test = "0.2.4"

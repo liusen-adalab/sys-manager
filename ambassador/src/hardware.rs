@@ -6,9 +6,11 @@ use protocol::monitor::{MachineReport, MonitorMessage};
 use tokio::net::TcpStream;
 use tokio_util::codec::Framed;
 
+#[allow(dead_code)]
 pub struct Client {}
 
 impl Client {
+    #[allow(dead_code)]
     pub async fn connect() -> Result<()> {
         let addr = "127.0.0.1:8991";
 

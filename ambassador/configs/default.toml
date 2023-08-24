@@ -1,0 +1,7 @@
+[manager]
+tcp = ""
+
+[log]
+logs_dir = "/var/log/ambassador"
+debug = "debug.log"
+warn = "warn.log"

@@ -368,10 +368,19 @@ macro_rules! doc_encpoints {
 #[cfg(test)]
 mod aa {
     #![allow(dead_code)]
+
+    mod bb {
+        pub enum ApiError {
+            Internal { source: anyhow::Error },
+
+            BusinessError(u32, String),
+        }
+    }
+
     code! {
         mod = "user"
         index = 10
-        err = crate::http::ApiError;
+        err = super::bb::ApiError;
 
         pub Password = 20 {
             too_long,

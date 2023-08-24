@@ -1,0 +1,13 @@
+[tasks.pack]
+script = '''
+cargo build --release
+
+pack_path='../target/ambassador-pack'
+mkdir -p ${pack_path}
+
+cp ../target/release/ambassador ${pack_path}
+cp ./scripts/install.sh ${pack_path}
+cp ./scripts/uninstall.sh ${pack_path}
+cp ./scripts/ambassador.service ${pack_path}
+cp ./configs/release.toml ${pack_path}/config.toml
+'''

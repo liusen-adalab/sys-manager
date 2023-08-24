@@ -1,0 +1,88 @@
+[env]
+DEPLOY_HOST = "arch4"
+SERVER_RUN_DIR = "~/system-manager"
+
+tmux_session = "manager"
+run_pane = "${tmux_session}:0.0"
+
+bin_name = "system-manager"
+
+[tasks.mybuild]
+script = '''
+cargo build --release
+'''
+
+[tasks.init-remote]
+script = '''
+set +x
+ssh ${DEPLOY_HOST} "mkdir -p ${SERVER_RUN_DIR}"
+
+
+ssh ${DEPLOY_HOST} "tmux kill-session -t ${tmux_session} || true"
+ssh ${DEPLOY_HOST} "tmux new -d -s ${tmux_session}"
+ssh ${DEPLOY_HOST} "tmux split-window -t ${tmux_session}"
+ssh ${DEPLOY_HOST}  "tmux send-keys -t ${run_pane} 'cd ${SERVER_RUN_DIR}' Enter"
+'''
+
+[tasks.deploy-cfg]
+script = '''
+set +x
+scp -r ./configs ${DEPLOY_HOST}:${SERVER_RUN_DIR}
+'''
+
+[tasks.sync-bin]
+script_runner = "@shell"
+dependencies = ["mybuild"]
+script.main = '''
+set -e
+set +x
+
+ssh ${DEPLOY_HOST} "pkill -f ${bin_name}" || true
+sleep 0.5
+scp ./target/release/${bin_name} ${DEPLOY_HOST}:${SERVER_RUN_DIR}
+ssh ${DEPLOY_HOST} "chmod +x ${SERVER_RUN_DIR}/${bin_name}"
+'''
+
+[tasks.deploy-bin]
+workspace = false
+dependencies = ["sync-bin", "run-remote"]
+
+[tasks.deploy-runner]
+script = '''
+set -e
+set +x
+
+cat << EOF | ssh ${DEPLOY_HOST} "cat > ${SERVER_RUN_DIR}/run.sh"
+./${bin_name}
+EOF
+
+ssh ${DEPLOY_HOST} "chmod +x ${SERVER_RUN_DIR}/run.sh"
+'''
+
+[tasks.run-remote]
+script = '''
+set +x
+ssh ${DEPLOY_HOST}  "tmux send-keys -t ${run_pane} './run.sh' Enter"
+'''
+
+
+[tasks.deploy-all]
+workspace = false
+dependencies = [
+    "init-remote",
+    "deploy-cfg",
+    "deploy-bin",
+    "deploy-runner",
+    "run-remote",
+]
+
+
+############### Alias #################
+[tasks.b]
+alias = "mybuild"
+
+[tasks.da]
+alias = "deploy-all"
+
+[tasks.dbin]
+alias = "deploy-bin"
